@@ -29,6 +29,23 @@ const Cms: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
         }
     }
 
+    const selectKeys = () => {
+        let url = window.location.pathname;
+        switch (url) {
+            case '/':
+                return '1'
+            case '/orders':
+                return '2'
+            case '/users':
+                return '3'
+            case '/products':
+                return '4'
+            default:
+                break;
+        }
+    }
+
+
     return (
         <Layout hasSider>
             <Sider
@@ -46,23 +63,23 @@ const Cms: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
                 <div className={styles.logo}>
                     <img src={logoImg} alt="logo" className={styles.logo_img} />
                 </div>
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['admin']}>
-                    <Menu.Item key="admin" icon={<UserOutlined />}>
+                <Menu theme="dark" mode="inline" defaultSelectedKeys={[`${selectKeys()}`]}>
+                    <Menu.Item key="1" icon={<UserOutlined />}>
                         <Link to="/">
                             Admin
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="orders" icon={<AppstoreOutlined />}>
+                    <Menu.Item key="2" icon={<AppstoreOutlined />}>
                         <Link to="/orders">
                             Đơn hàng
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="users" icon={<TeamOutlined />}>
+                    <Menu.Item key="3" icon={<TeamOutlined />}>
                         <Link to="/users">
                             Người dùng
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="products" icon={<ShopOutlined />}>
+                    <Menu.Item key="4" icon={<ShopOutlined />}>
                         <Link to="/products">
                             Sản phẩm
                         </Link>
