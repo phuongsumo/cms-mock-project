@@ -1,26 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
+import { Login, Cms } from './components/index';
 
 function App() {
+
+  const [login, setLogin] = useState<boolean>(false);
+  const data: any = (localStorage.getItem('account'));
+
+  useEffect(() => {
+
+    if (JSON.parse(data).username === 'admin') {
+      setLogin(true);
+    } else {
+      setLogin(false);
+    }
+  }, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {
+        login ? <Cms setLogin={setLogin} /> : <Login setLogin={setLogin} />
+      }
     </div>
-  );
+  )
 }
 
 export default App;
