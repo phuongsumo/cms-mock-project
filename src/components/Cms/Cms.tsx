@@ -29,6 +29,7 @@ const Cms: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
         }
     }
 
+    // Set default key nav bar
     const selectKeys = () => {
         let url = window.location.pathname;
         switch (url) {

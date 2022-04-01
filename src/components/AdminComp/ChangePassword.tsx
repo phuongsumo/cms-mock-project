@@ -102,14 +102,6 @@ const ChangePassword: React.FC<{ isModalVisible: boolean, setIsModalVisible: Fun
                     <Button type="primary" htmlType="submit">
                         Xác nhận
                     </Button>
-                    {/* <Button
-                        style={{ margin: '0 8px' }}
-                        onClick={() => {
-                            form.resetFields();
-                        }}
-                    >
-                        Clear
-                    </Button> */}
                 </Form.Item>
             </Form>
         </Modal>

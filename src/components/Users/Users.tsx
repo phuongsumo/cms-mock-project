@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, Space, Input } from 'antd';
+import { Table, Space, Input, Spin } from 'antd';
+import styles from './Users.module.css'
 
 const api = 'https://6227fddb9fd6174ca81830f6.mockapi.io/tea-shop/users';
 
@@ -22,6 +23,7 @@ interface RootObject {
 const Users = () => {
     const [data, setData] = useState<RootObject[]>([]);
     const [list, setList] = useState<RootObject[]>([]);
+    const [spin, setSpin] = useState<boolean>(true);
     const [reRender, setReRender] = useState<string>('');
 
     const { Column } = Table;
@@ -31,6 +33,7 @@ const Users = () => {
             .then((response) => {
                 setData(response.data)
                 setList(response.data)
+                setSpin(false)
             })
     }, [reRender])
 
@@ -67,7 +70,7 @@ const Users = () => {
                 size="large"
                 onChange={(e) => onChangeInput(e.target.value)}
             />
-            <Table dataSource={list}>
+            {spin ? <Spin className={styles.spin} /> : <Table bordered dataSource={list}>
                 <Column title="Tên đăng nhập" dataIndex="username" key="username" />
                 <Column title="Mật khẩu" dataIndex="password" key="password" />
                 <Column title="Tên" dataIndex="fullName" key="username" />
@@ -83,7 +86,7 @@ const Users = () => {
                         </Space>
                     )}
                 />
-            </Table>
+            </Table>}
         </>
     )
 }
