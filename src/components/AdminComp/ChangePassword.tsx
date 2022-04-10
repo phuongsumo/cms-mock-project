@@ -34,6 +34,7 @@ const ChangePassword: React.FC<{ isModalVisible: boolean, setIsModalVisible: Fun
         console.log('Failed:', errorInfo);
     };
 
+    var pwdRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
     return (
         <Modal
             title="Đổi mật khẩu"
@@ -72,7 +73,24 @@ const ChangePassword: React.FC<{ isModalVisible: boolean, setIsModalVisible: Fun
                 <Form.Item
                     label="Mật khẩu mới"
                     name="newPassword"
-                    rules={[{ required: true, message: 'Vui lòng nhập tối thiểu 6 ký tự', min: 6 }]}
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng nhập ít nhất 6 ký tự'
+                        },
+                        {
+                            min: 6,
+                            message: 'Vui lòng nhập ít nhất 6 ký tự'
+                        },
+                        {
+                            max: 20,
+                            message: 'Vui lòng nhập tối đa 20 ký tự'
+                        },
+                        {
+                            pattern: pwdRegex,
+                            message: 'Vui lòng nhập tối thiểu một ký tự viết hoa và một ký tự số'
+                        },
+                    ]}
                 >
                     <Input.Password />
                 </Form.Item>

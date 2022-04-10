@@ -70,23 +70,28 @@ const Users = () => {
                 size="large"
                 onChange={(e) => onChangeInput(e.target.value)}
             />
-            {spin ? <Spin className={styles.spin} /> : <Table bordered dataSource={list}>
-                <Column title="Tên đăng nhập" dataIndex="username" key="username" />
-                <Column title="Mật khẩu" dataIndex="password" key="password" />
-                <Column title="Tên" dataIndex="fullName" key="username" />
-                <Column title="Địa chỉ" dataIndex="address" key="address" />
-                <Column title="Email" dataIndex="email" key="email" />
-                <Column title="Số điện thoại" dataIndex="phone" key="phone" />
-                <Column
-                    title="Action"
-                    key="action"
-                    render={(text, record: any) => (
-                        <Space size="middle">
-                            <a onClick={() => handleDelete(record.id)}>Xóa</a>
-                        </Space>
-                    )}
-                />
-            </Table>}
+            {spin ? <Spin className={styles.spin} /> :
+                <Table
+                    bordered
+                    dataSource={list}
+                    scroll={{ x: 300 }}
+                >
+                    <Column title="Tên đăng nhập" dataIndex="username" key="username" />
+                    <Column title="Mật khẩu" dataIndex="password" key="password" />
+                    <Column title="Tên" dataIndex="fullName" key="username" />
+                    <Column title="Địa chỉ" dataIndex="address" key="address" />
+                    <Column title="Email" dataIndex="email" key="email" />
+                    <Column title="Số điện thoại" dataIndex="phone" key="phone" />
+                    <Column
+                        title="Action"
+                        key="action"
+                        render={(text, record: any) => (
+                            <Space size="middle">
+                                <a onClick={() => handleDelete(record.id)}>Xóa</a>
+                            </Space>
+                        )}
+                    />
+                </Table>}
         </>
     )
 }
