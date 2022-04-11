@@ -162,7 +162,7 @@ const Orders = () => {
                             key="orders"
                             render={(text, record: any) => (
                                 <Space size="middle">
-                                    <a onClick={() => handleDetails(record)}>Chi tiết</a>
+                                    <Button type="primary" onClick={() => handleDetails(record)}>Chi tiết</Button>
                                 </Space>
                             )}
                         />

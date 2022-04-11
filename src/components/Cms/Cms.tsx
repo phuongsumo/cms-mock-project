@@ -103,7 +103,7 @@ const Cms: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>
-                    ToCoToCo
+                    Tocotoco
                 </Footer>
             </Layout>
         </Layout>

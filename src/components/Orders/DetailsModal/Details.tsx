@@ -20,7 +20,7 @@ const Details: React.FC<{ details: boolean, setDetails: Function, record: any }>
                 onOk={() => setDetails(false)}
                 onCancel={() => setDetails(false)}
                 width={1500}
-                style={{ top: 50 }}
+                style={{ top: 10 }}
             >
                 <Table
                     dataSource={record.orders}
@@ -28,7 +28,7 @@ const Details: React.FC<{ details: boolean, setDetails: Function, record: any }>
                     scroll={{ y: 300 }}
                     footer={(record: any) => {
                         let totalPrice: number = record.reduce((a: any, b: any) => a + Number(b.total), 0);
-                        return `Tổng thanh toán: ${totalPrice} đồng`
+                        return `Tổng thanh toán: ${totalPrice.toLocaleString('vi', { style: 'currency', currency: 'VND' })}`
                     }}
                 >
                     <Column width={150} title="Tên" dataIndex="name" key="name" />
