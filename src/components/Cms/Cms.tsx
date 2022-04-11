@@ -104,7 +104,7 @@ const Cms: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>
-                    Nhóm 3 - Nhóm Câu đơ
+                    ToCoToCo
                 </Footer>
             </Layout>
         </Layout>
