@@ -1,9 +1,414 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios';
+import { Table, Space, Input, Checkbox, Modal, Form, Select, Radio, } from 'antd';
+import styles from '../Products/Product.module.css'
+import { AudioOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import style from './Product.module.css'
+import { Link } from 'react-router-dom';
+
+
+
+const api = 'https://6227fddb9fd6174ca81830f6.mockapi.io/tea-shop/product';
+const apiImage = 'https://api.cloudinary.com/v1_1/tocotoco/image/upload';
+
+interface ProductObject {
+    lenght: any;
+    name: string;
+    price: string;
+    salePrice: string;
+    image: string;
+    category: string;
+    sizeM: string;
+    sizeL: string;
+    id: string;
+    key: string;
+    created_at: string;
+}
 
 const Product = () => {
-  return (
-    <h1>Product</h1>
-  )
+    const [data, setData] = useState<ProductObject[]>([]);
+    const [list, setList] = useState<ProductObject[]>([]);
+    const [reRender, setReRender] = useState<string>('');
+    const [isEditing, setEditing] = useState(false);
+    const [editProduct, setEditProduct] = useState<any>('')
+    const Option = Select.Option;
+    const [form] = Form.useForm();
+    const [image, setImage] = useState<any>();
+    const [imageSelected, setImageSelected] = useState<any>();
+    function handleChange(value: any) {
+        console.log(`selected ${value}`);
+
+    }
+
+    const { Column } = Table;
+
+    useEffect(() => {
+        axios.get(api)
+            .then((response) => {
+                setData(response.data)
+                setList(response.data)
+            })
+    }, [reRender])
+
+    data.map((product, i) => {
+        product.key = product.id
+        data[i] = product;
+    })
+
+
+    const handleDelete = (id: string) => {
+        if (data.length < 1) {
+            alert('Không thể xóa hết tất cả các sản phẩm!')
+        } else {
+            let result = window.confirm('Bạn chắc chắn muốn xóa sản phẩm này?')
+            if (result) {
+                axios.delete(`${api}/${id}`)
+                    .then(response => setReRender(id))
+            }
+        }
+    }
+
+    const { Search } = Input;
+
+    const suffix = (
+        <AudioOutlined
+            style={{
+                fontSize: 16,
+                color: '#1890ff',
+            }}
+        />
+    );
+    const onSearch = (value: any) => {
+        let users = data.filter(user => {
+            return user.name.includes(value)
+        })
+        setList(users);
+    };
+
+    const onedit = (record: any) => {
+        setEditing(true);
+        setEditProduct(record)
+    };
+
+    const handleImageChange = (data: any) => {
+        if (data) {
+            setImageSelected(data)
+            const img = data
+            img.preview = URL.createObjectURL(data)
+            setImage(img)
+        } else {
+            setImage('')
+        }
+    }
+
+
+    const resetEditing = () => {
+        setEditing(false);
+    }
+
+    const handleEditSubmit = (values: any) => {
+
+        if (imageSelected) {
+            const formData = new FormData();
+            formData.append("file", imageSelected);
+            formData.append("upload_preset", "tocoproduct");
+
+            axios.post(apiImage, formData)
+                .then(response => {
+                    // Assign data to Cloudinary image URL
+                    values.image = response.data.secure_url
+                    // Put data to Api
+                    axios.put(`${api}/${values.id}`, values)
+                        .then((res) => {
+                            alert('Thay đổi thành công')
+                            setEditing(false);
+                        })
+                        .catch(err => alert('Có lỗi xảy ra'))
+                })
+                .catch(err => alert('Có lỗi xảy ra'))
+        } else {
+            axios.put(`${api}/${values.id}`, values)
+                .then((res) => {
+                    alert('Thay đổi thành công')
+                    setEditing(false);
+                })
+                .catch(err => alert('Có lỗi xảy ra'))
+        }
+    }
+
+
+    return (
+        <>
+            <Search
+                placeholder="Tìm kiếm tên sản phẩm"
+                enterButton="Search"
+                size="large"
+                suffix={suffix}
+                onSearch={onSearch}
+            />
+
+            <>
+                <Link to="/AddProducts" className={style.btn} >
+                    Add product
+                </Link>
+
+            </>
+
+            <Table bordered dataSource={list} className={style.table}  >
+                <Column title="Tên sản phẩm " dataIndex="name" key="name" />
+                <Column title="Giá bán " dataIndex="price" key="price" />
+                <Column title="Giá bán khuyến mại" dataIndex="salePrice" key="salePrice" />
+                <Column title="Ảnh minh họa" key="image" render={(text, record: any) => (
+                    <Space size="middle">
+                        <img style={{ width: 100, height: 100, objectFit: 'cover' }}
+                            src={record.image}
+                        />
+                    </Space>
+                )} />
+
+
+
+                <Column title="Loại sản phẩm" dataIndex="category" key="category" render={(text, record: any) => {
+                    const a = record.category;
+                    function SwitchCase(props: any): any {
+
+                        switch (a) {
+
+                            case '1':
+
+                                return 'Trà sữa';
+
+                            case '2':
+
+                                return 'Fresh Fruit Tea';
+                            case '3':
+
+                                return 'Machiato Cream Cheese';
+                            case '4':
+
+                                return 'Sữa chua dẻo';
+                            default:
+
+                                return 'Lỗi dữ liệu'
+
+
+                        }
+
+                    }
+                    return (
+                        <Space size="middle">
+                            <SwitchCase />
+                        </Space>
+                    )
+
+                }
+
+                } />
+                <Column title="Kích thức sản phẩm" dataIndex="sizeM"
+                    render={(text, record: any) => {
+                        const a = record.sizeM;
+                        const b = record.sizeL;
+                        function SwitchCase(props: any): any {
+
+                            if (!a) {
+                                return (<b style={{ color: '#9FC088' }}> Size L </b>)
+                            } else if (!b) {
+                                return (<b style={{ color: '#E8C07D' }}> Size M </b>)
+                            }
+                            else {
+                                return (<b style={{ color: '#CC704B' }}> Size M và Size L </b>)
+                            }
+                        }
+                        return (
+                            <Space size="middle">
+                                <SwitchCase />
+                            </Space>
+                        )
+
+                    }} />
+                <Column title="Sản phẩm hot" dataIndex="hot" render={(text, record: any) => {
+                    return (
+                        <Space size="middle">
+                            {record.hot
+                                ?
+                                <p style={{ color: 'red' }}> Hot </p>
+                                :
+                                <p style={{ color: 'green' }}> Không hot </p>
+                            }
+                        </Space>
+                    )
+
+                }} />
+                <Column
+                    title="Action"
+                    key="action"
+                    render={(text, record: any) => (
+
+                        <Space size="middle">
+                            <DeleteOutlined onClick={() => handleDelete(record.id)}>Xóa</DeleteOutlined>
+                            <EditOutlined onClick={() => { onedit(record); }}>Sửa </EditOutlined>
+                        </Space>
+                    )}
+                />
+
+            </Table>
+            <Modal
+                style={
+                    {
+                        width: '70%',
+                    }
+                }
+                title="Sửa sản phẩm"
+                visible={isEditing}
+                okText="Save"
+                onCancel={() => {
+                    resetEditing()
+                }}
+                onOk={() => handleEditSubmit(editProduct)}
+            >
+                <Form form={form} name="register" initialValues={{ remember: true }}
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 10 }}
+                >
+                    <Form.Item label="Tên sản phẩm"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Không được để trông tên sản phẩm',
+                            },
+                            { whitespace: true },
+                            { min: 6 }
+                        ]}
+                        hasFeedback>
+                        <Input value={editProduct.name} onChange={(e) => {
+                            setEditProduct((pre: any) => {
+                                return { ...pre, name: e.target.value }
+                            })
+                        }} />
+                    </Form.Item>
+                    <Form.Item label="Giá bán" rules={[{
+                        required: true,
+                        message: 'Không được để trông  giá bán',
+                    },
+                    { whitespace: true },
+                    { min: 1 }
+                    ]}
+                        hasFeedback>
+                        <Input value={editProduct.price} onChange={(e) => {
+                            setEditProduct((pre: any) => {
+                                return { ...pre, price: e.target.value }
+                            })
+                        }} />
+                    </Form.Item>
+                    <Form.Item label="Giá bán khuyến mãi" rules={[{
+                        required: false
+                    },
+                    { whitespace: true },
+                    { min: 1 }
+                    ]}
+                        hasFeedback>
+                        <Input value={editProduct.salePrice} onChange={(e) => {
+                            setEditProduct((pre: any) => {
+                                return { ...pre, salePrice: e.target.value }
+                            })
+                        }} />
+                    </Form.Item>
+                    <Form.Item label="Loại sản phẩm" >
+                        <Select placeholder="Loại sản phẩm"
+                            style={{ width: '100%' }}
+                            onChange={(e) => {
+                                console.log(e);
+
+                                setEditProduct((pre: any) => {
+                                    return { ...pre, category: e }
+                                })
+                            }}
+                            value={editProduct.category}
+                        >
+                            <Option value="1">Trà sữa</Option>
+                            <Option value="2">Fresh Fruit Tea</Option>
+                            <Option value="3">Machiato Cream Cheese</Option>
+                            <Option value="4">Sữa chua dẻo</Option>
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Ảnh sản phẩm"
+                    >
+                        <label htmlFor='iput_img' className={style.div}>
+                            <input id='iput_img' style={{ display: 'none' }} type='file' onChange={(e: any) => {
+                                handleImageChange(e.target.files[0])
+                            }}
+                            />
+                            {image ?
+                                <img
+                                    className={styles.input_img}
+                                    src={image.preview}
+                                    alt="Anh"
+                                    style={{ width: 100, height: 100, objectFit: 'cover' }}
+                                />
+                                :
+                                <img
+                                    className={styles.input_img}
+                                    src={editProduct.image}
+                                    alt="Anh"
+                                    style={{ width: 100, height: 100, objectFit: 'cover' }}
+                                />
+                            }
+                        </label>
+
+                    </Form.Item>
+                    <Form.Item name='size' label="Kích thước sản phẩm">
+                        <Checkbox
+                            value="1"
+                            style={{ lineHeight: '32px' }}
+                            checked={editProduct.sizeM}
+                            onChange={() =>
+                                setEditProduct((pre: any) => {
+                                    return { ...pre, sizeM: !editProduct.sizeM }
+                                })
+                            }
+                        >
+                            Size M
+                        </Checkbox>
+                        <Checkbox
+                            value="2"
+                            style={{ lineHeight: '32px' }}
+                            checked={editProduct.sizeL}
+                            onChange={() =>
+                                setEditProduct((pre: any) => {
+                                    return { ...pre, sizeL: !editProduct.sizeL }
+                                })
+                            }
+                        >
+                            Size L
+                        </Checkbox>
+
+                    </Form.Item>
+                    <Form.Item
+                        label="Sản phẩm nổi bật"
+                    >
+                        <Radio.Group value={editProduct.hot} onChange={(e) => {
+                            setEditProduct((pre: any) => {
+                                return { ...pre, hot: !pre.hot }
+                            })
+                        }}>
+                            <Radio value={true}>Có</Radio>
+                            <Radio value={false}>Không</Radio>
+                        </Radio.Group>
+
+                    </Form.Item>
+                </Form>
+
+
+
+            </Modal>
+        </>
+    )
 }
 
 export default Product
+
+function setSize(value: any): void {
+    throw new Error('Function not implemented.');
+}

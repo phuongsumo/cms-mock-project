@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react'
 import { Routes, Route, Link } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import {
@@ -9,7 +9,7 @@ import {
     MenuOutlined,
     CloseCircleOutlined,
 } from '@ant-design/icons';
-import { AdminComp, Orders, Products, Users } from '../index.js';
+import { AdminComp, Orders, Products, Users, AddProducts } from '../index.js';
 import logoImg from './Logo.png'
 import styles from './Cms.module.css';
 
@@ -99,6 +99,8 @@ const Cms: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
                             <Route path="/orders" element={<Orders />} />
                             <Route path="/users" element={<Users />} />
                             <Route path="/products" element={<Products />} />
+                            <Route path="/AddProducts" element={<AddProducts />} />
+
                         </Routes>
                     </div>
                 </Content>
