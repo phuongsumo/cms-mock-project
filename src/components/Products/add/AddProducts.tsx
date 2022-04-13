@@ -39,7 +39,7 @@ const AddProducts = () => {
     const [image, setImage] = useState<any>();
     const [imageSelected, setImageSelected] = useState<any>();
     const [fileList, setFileList] = useState<any>([]);
-
+    let navigate = useNavigate();
     function handleChange(value: any) {
         console.log(`selected ${value}`);
 
