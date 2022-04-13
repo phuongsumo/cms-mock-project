@@ -32,7 +32,7 @@ const Details: React.FC<{ details: boolean, setDetails: Function, record: any }>
                     }}
                 >
                     <Column width={150} title="Tên" dataIndex="name" key="name" />
-                    <Column width={95} title="Số lượng" dataIndex="amount" key="amount" />
+                    <Column width={95} title="Số lượng" dataIndex="quantitySelect" key="quantitySelect" />
                     <Column
                         width={60}
                         title="Size"
