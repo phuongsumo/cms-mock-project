@@ -2,7 +2,7 @@ import { Button, Checkbox, Col, Form, Input, Radio, Row, Select } from "antd"
 import React, { useEffect, useState } from "react"
 import styles from '../Product.module.css'
 import axios from "axios"
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -39,7 +39,7 @@ const AddProducts = () => {
     const [image, setImage] = useState<any>();
     const [imageSelected, setImageSelected] = useState<any>();
     const [fileList, setFileList] = useState<any>([]);
-
+    let navigate = useNavigate();
     function handleChange(value: any) {
         console.log(`selected ${value}`);
 
@@ -84,7 +84,8 @@ const AddProducts = () => {
 
                 // Post data to Api
                 axios.post(api, values)
-                    .then(() => { alert("Thêm sản phẩm thành công "); <Link to={"./products"} /> })
+                    .then(() => { alert("Thêm sản phẩm thành công ") })
+                    .then(() => { navigate("/products", { replace: true }) })
                     .catch(err => alert('Có lỗi xảy ra'))
             })
             .catch(err => alert('Có lỗi xảy ra'))
