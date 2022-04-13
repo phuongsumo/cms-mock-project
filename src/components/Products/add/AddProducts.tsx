@@ -84,7 +84,7 @@ const AddProducts = () => {
 
                 // Post data to Api
                 axios.post(api, values)
-                    .then(() => { alert("Thêm sản phẩm thành công "), <Link to={"./products"} /> })
+                    .then(() => { alert("Thêm sản phẩm thành công "); <Link to={"./products"} /> })
                     .catch(err => alert('Có lỗi xảy ra'))
             })
             .catch(err => alert('Có lỗi xảy ra'))
