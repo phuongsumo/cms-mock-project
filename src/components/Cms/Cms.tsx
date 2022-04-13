@@ -100,6 +100,7 @@ const Cms: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
                             <Route path="/users" element={<Users />} />
                             <Route path="/products" element={<Products />} />
                             <Route path="/AddProducts" element={<AddProducts />} />
+
                         </Routes>
                     </div>
                 </Content>
