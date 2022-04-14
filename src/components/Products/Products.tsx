@@ -290,8 +290,8 @@ const Product = () => {
                         ]}
                         hasFeedback>
                         <Input value={editProduct.name} onChange={(e) => {
-                            if (e.target.value === '') {
-                                message.error('Không được để trông tên sản phẩm')
+                            if (e.target.value.length < 6) {
+                                message.error('Tên sản phẩm phải trên 6 ký tự')
                             }
                             else {
                                 setEditProduct((pre: any) => {
@@ -313,6 +313,9 @@ const Product = () => {
                         <Input value={editProduct.price} onChange={(e) => {
                             if (e.target.value === '') {
                                 message.error('Không được để trông giá sản phẩm')
+                            }
+                            else if (parseInt(e.target.value) < 0) {
+                                message.error('Giá sản phẩm không được để âm')
                             }
                             else {
                                 setEditProduct((pre: any) => {
