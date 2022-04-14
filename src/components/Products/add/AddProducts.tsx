@@ -62,10 +62,12 @@ const AddProducts = () => {
     }, [image])
 
     const onFinish = (values: any) => {
-        setConfirmLoading(true)
+        setConfirmLoading(true);
+
         const formData = new FormData();
         formData.append("file", imageSelected);
         formData.append("upload_preset", "tocoproduct");
+
         axios.post(apiImage, formData)
             .then(response => {
                 // Assign data to Cloudinary image URL
@@ -79,6 +81,7 @@ const AddProducts = () => {
                 } else if (values.size[0] === '2') {
                     values.sizeM = false;
                     values.sizeL = true;
+
                 }
                 delete values.size;
                 if (!values.hot) {

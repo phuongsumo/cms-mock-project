@@ -29,7 +29,7 @@ const Product = () => {
     const [data, setData] = useState<ProductObject[]>([]);
     const [list, setList] = useState<ProductObject[]>([]);
     const [spin, setSpin] = useState<boolean>(true);
-    const [reRender, setReRender] = useState<string>('');
+    const [reRender, setReRender] = useState<any>('');
     const [isEditing, setEditing] = useState(false);
     const [editProduct, setEditProduct] = useState<any>('')
     const Option = Select.Option;
@@ -135,6 +135,7 @@ const Product = () => {
                         .then((res) => {
                             message.success('Thay đổi thành công')
                             setEditing(false);
+                            setReRender(res)
                         })
                         .catch(err => message.error('Có lỗi xảy ra'))
                 })
@@ -144,6 +145,7 @@ const Product = () => {
                 .then((res) => {
                     message.success('Thay đổi thành công')
                     setEditing(false);
+                    setReRender(res)
                 })
                 .catch(err => message.error('Có lỗi xảy ra'))
         }
@@ -417,12 +419,8 @@ const Product = () => {
                             <Radio value={true}>Có</Radio>
                             <Radio value={false}>Không</Radio>
                         </Radio.Group>
-
                     </Form.Item>
                 </Form>
-
-
-
             </Modal>
         </>
     )
