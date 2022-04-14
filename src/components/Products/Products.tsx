@@ -163,70 +163,47 @@ const Product = () => {
                 Thêm sản phẩm
             </Link>
 
-            {spin ? <Spin></Spin> : <Table bordered dataSource={list} className={style.table}  >
-                <Column title="Tên sản phẩm " dataIndex="name" key="name" />
-                <Column title="Giá bán " dataIndex="price" key="price" />
-                <Column title="Giá bán khuyến mại" dataIndex="salePrice" key="salePrice" />
-                <Column title="Ảnh minh họa" key="image" render={(text, record: any) => (
-                    <Space size="middle">
-                        <img style={{ width: 100, height: 100, objectFit: 'cover' }}
-                            src={record.image}
-                        />
-                    </Space>
-                )} />
-
-
-
-                <Column title="Loại sản phẩm" dataIndex="category" key="category" render={(text, record: any) => {
-                    const a = record.category;
-                    function SwitchCase(props: any): any {
-
-                        switch (a) {
-
-                            case '1':
-
-                                return 'Trà sữa';
-
-                            case '2':
-
-                                return 'Fresh Fruit Tea';
-                            case '3':
-
-                                return 'Machiato Cream Cheese';
-                            case '4':
-
-                                return 'Sữa chua dẻo';
-                            default:
-
-                                return 'Lỗi dữ liệu'
-
-
-                        }
-
-                    }
-                    return (
+            {spin ? <Spin></Spin> :
+                <Table bordered dataSource={list} className={style.table} scroll={{ x: 300 }} >
+                    <Column title="Tên sản phẩm " dataIndex="name" key="name" />
+                    <Column title="Giá bán " dataIndex="price" key="price" />
+                    <Column title="Giá bán khuyến mại" dataIndex="salePrice" key="salePrice" />
+                    <Column title="Ảnh minh họa" key="image" render={(text, record: any) => (
                         <Space size="middle">
-                            <SwitchCase />
+                            <img style={{ width: 100, height: 100, objectFit: 'cover' }}
+                                src={record.image}
+                            />
                         </Space>
-                    )
+                    )} />
 
-                }
 
-                } />
-                <Column title="Kích thức sản phẩm" dataIndex="sizeM"
-                    render={(text, record: any) => {
-                        const a = record.sizeM;
-                        const b = record.sizeL;
+
+                    <Column title="Loại sản phẩm" dataIndex="category" key="category" render={(text, record: any) => {
+                        const a = record.category;
                         function SwitchCase(props: any): any {
 
-                            if (!a) {
-                                return (<b style={{ color: '#9FC088' }}> Size L </b>)
-                            } else if (!b) {
-                                return (<b style={{ color: '#E8C07D' }}> Size M </b>)
+                            switch (a) {
+
+                                case '1':
+
+                                    return 'Trà sữa';
+
+                                case '2':
+
+                                    return 'Fresh Fruit Tea';
+                                case '3':
+
+                                    return 'Machiato Cream Cheese';
+                                case '4':
+
+                                    return 'Sữa chua dẻo';
+                                default:
+
+                                    return 'Lỗi dữ liệu'
+
+
                             }
-                            else {
-                                return (<b style={{ color: '#CC704B' }}> Size M và Size L </b>)
-                            }
+
                         }
                         return (
                             <Space size="middle">
@@ -234,33 +211,57 @@ const Product = () => {
                             </Space>
                         )
 
-                    }} />
-                <Column title="Sản phẩm hot" dataIndex="hot" render={(text, record: any) => {
-                    return (
-                        <Space size="middle">
-                            {record.hot
-                                ?
-                                <p style={{ color: 'red' }}> Hot </p>
-                                :
-                                <p style={{ color: 'green' }}> Không hot </p>
+                    }
+
+                    } />
+                    <Column title="Kích thức sản phẩm" dataIndex="sizeM"
+                        render={(text, record: any) => {
+                            const a = record.sizeM;
+                            const b = record.sizeL;
+                            function SwitchCase(props: any): any {
+
+                                if (!a) {
+                                    return (<b style={{ color: '#9FC088' }}> Size L </b>)
+                                } else if (!b) {
+                                    return (<b style={{ color: '#E8C07D' }}> Size M </b>)
+                                }
+                                else {
+                                    return (<b style={{ color: '#CC704B' }}> Size M và Size L </b>)
+                                }
                             }
-                        </Space>
-                    )
+                            return (
+                                <Space size="middle">
+                                    <SwitchCase />
+                                </Space>
+                            )
 
-                }} />
-                <Column
-                    title="Thao tác"
-                    key="action"
-                    render={(text, record: any) => (
+                        }} />
+                    <Column title="Sản phẩm hot" dataIndex="hot" render={(text, record: any) => {
+                        return (
+                            <Space size="middle">
+                                {record.hot
+                                    ?
+                                    <p style={{ color: 'red' }}> Hot </p>
+                                    :
+                                    <p style={{ color: 'green' }}> Không hot </p>
+                                }
+                            </Space>
+                        )
 
-                        <Space size="middle">
-                            <DeleteOutlined onClick={() => showConfirmDelete(record.id)}>Xóa</DeleteOutlined>
-                            <EditOutlined onClick={() => { onedit(record); }}>Sửa </EditOutlined>
-                        </Space>
-                    )}
-                />
+                    }} />
+                    <Column
+                        title="Thao tác"
+                        key="action"
+                        render={(text, record: any) => (
 
-            </Table>}
+                            <Space size="middle">
+                                <DeleteOutlined onClick={() => showConfirmDelete(record.id)}>Xóa</DeleteOutlined>
+                                <EditOutlined onClick={() => { onedit(record); }}>Sửa </EditOutlined>
+                            </Space>
+                        )}
+                    />
+
+                </Table>}
             <Modal
                 style={
                     {
