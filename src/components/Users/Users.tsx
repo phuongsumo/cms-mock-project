@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, Space, Input, Spin } from 'antd';
+import { Table, Space, Input, Spin, message, Modal } from 'antd';
 import styles from './Users.module.css'
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const api = 'https://6227fddb9fd6174ca81830f6.mockapi.io/tea-shop/users';
 
@@ -27,6 +28,7 @@ const Users = () => {
     const [reRender, setReRender] = useState<string>('');
 
     const { Column } = Table;
+    const { confirm } = Modal;
 
     useEffect(() => {
         axios.get(api)
@@ -42,22 +44,32 @@ const Users = () => {
         data[i] = user;
     })
 
-
-    const handleDelete = (id: string) => {
-        if (id === '1') {
-            alert('Không thể xóa tài khoản này!')
-        } else {
-            let result = window.confirm('Bạn chắc chắn muốn xóa tài khoản này?')
-            if (result) {
-                axios.delete(`${api}/${id}`)
-                    .then(response => setReRender(id))
-            }
-        }
+    function showConfirmDelete(id: string) {
+        confirm({
+            title: 'Bạn chắc chắn muốn xóa tài khoản này?',
+            icon: <ExclamationCircleOutlined />,
+            content: 'Tài khoản sẽ bị xóa vĩnh viễn',
+            onOk() {
+                if (id === '1') {
+                    message.error('Không thể xóa tài khoản này!')
+                } else {
+                    axios.delete(`${api}/${id}`)
+                        .then(response => {
+                            setReRender(id)
+                            message.success('Xóa tài khoản thành công')
+                        })
+                }
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
+        });
     }
+
 
     const onChangeInput = (value: string) => {
         let users = data.filter(user => {
-            return user.username.includes(value)
+            return user.username.toLowerCase().includes(value.toLowerCase())
         })
         setList(users);
     }
@@ -87,7 +99,7 @@ const Users = () => {
                         key="action"
                         render={(text, record: any) => (
                             <Space size="middle">
-                                <a onClick={() => handleDelete(record.id)}>Xóa</a>
+                                <a onClick={() => showConfirmDelete(record.id)}>Xóa</a>
                             </Space>
                         )}
                     />

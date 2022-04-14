@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
-import { Table, Space, Input, Checkbox, Modal, Form, Select, Radio, } from 'antd';
+import { Table, Space, Input, Checkbox, Modal, Form, Select, Radio, message, Spin } from 'antd';
 import styles from '../Products/Product.module.css'
-import { AudioOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { AudioOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import style from './Product.module.css'
 import { Link } from 'react-router-dom';
 
@@ -28,6 +28,7 @@ interface ProductObject {
 const Product = () => {
     const [data, setData] = useState<ProductObject[]>([]);
     const [list, setList] = useState<ProductObject[]>([]);
+    const [spin, setSpin] = useState<boolean>(true);
     const [reRender, setReRender] = useState<string>('');
     const [isEditing, setEditing] = useState(false);
     const [editProduct, setEditProduct] = useState<any>('')
@@ -35,37 +36,50 @@ const Product = () => {
     const [form] = Form.useForm();
     const [image, setImage] = useState<any>();
     const [imageSelected, setImageSelected] = useState<any>();
-    function handleChange(value: any) {
-        console.log(`selected ${value}`);
-
-    }
 
     const { Column } = Table;
+    const { confirm } = Modal;
 
     useEffect(() => {
         axios.get(api)
             .then((response) => {
                 setData(response.data)
                 setList(response.data)
+                setSpin(false)
             })
     }, [reRender])
+
+    useEffect(() => {
+        return () => {
+            image && URL.revokeObjectURL(image.preview)
+        }
+    }, [image])
 
     data.map((product, i) => {
         product.key = product.id
         data[i] = product;
     })
 
-
-    const handleDelete = (id: string) => {
-        if (data.length < 1) {
-            alert('Không thể xóa hết tất cả các sản phẩm!')
-        } else {
-            let result = window.confirm('Bạn chắc chắn muốn xóa sản phẩm này?')
-            if (result) {
-                axios.delete(`${api}/${id}`)
-                    .then(response => setReRender(id))
-            }
-        }
+    function showConfirmDelete(id: string) {
+        confirm({
+            title: 'Bạn chắc chắn muốn xóa sản phẩm này?',
+            icon: <ExclamationCircleOutlined />,
+            content: 'Sản phẩm sẽ bị xóa vĩnh viễn',
+            onOk() {
+                if (data.length < 1) {
+                    message.error('Không thể xóa hết tất cả các sản phẩm!')
+                } else {
+                    axios.delete(`${api}/${id}`)
+                        .then(response => {
+                            setReRender(id)
+                            message.success('Xóa sản phẩm thành công')
+                        })
+                }
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
+        });
     }
 
     const { Search } = Input;
@@ -80,7 +94,7 @@ const Product = () => {
     );
     const onSearch = (value: any) => {
         let users = data.filter(user => {
-            return user.name.includes(value)
+            return user.name.toLowerCase().includes(value.toLowerCase());
         })
         setList(users);
     };
@@ -101,7 +115,6 @@ const Product = () => {
         }
     }
 
-
     const resetEditing = () => {
         setEditing(false);
     }
@@ -120,41 +133,37 @@ const Product = () => {
                     // Put data to Api
                     axios.put(`${api}/${values.id}`, values)
                         .then((res) => {
-                            alert('Thay đổi thành công')
+                            message.success('Thay đổi thành công')
                             setEditing(false);
                         })
-                        .catch(err => alert('Có lỗi xảy ra'))
+                        .catch(err => message.error('Có lỗi xảy ra'))
                 })
-                .catch(err => alert('Có lỗi xảy ra'))
+                .catch(err => message.error('Có lỗi xảy ra'))
         } else {
             axios.put(`${api}/${values.id}`, values)
                 .then((res) => {
-                    alert('Thay đổi thành công')
+                    message.success('Thay đổi thành công')
                     setEditing(false);
                 })
-                .catch(err => alert('Có lỗi xảy ra'))
+                .catch(err => message.error('Có lỗi xảy ra'))
         }
     }
-
 
     return (
         <>
             <Search
                 placeholder="Tìm kiếm tên sản phẩm"
-                enterButton="Search"
+                enterButton="Tìm kiếm"
                 size="large"
                 suffix={suffix}
                 onSearch={onSearch}
             />
 
-            <>
-                <Link to="/AddProducts" className={style.btn} >
-                    Add product
-                </Link>
+            <Link to="/AddProducts" className={style.btn} >
+                Thêm sản phẩm
+            </Link>
 
-            </>
-
-            <Table bordered dataSource={list} className={style.table}  >
+            {spin ? <Spin></Spin> : <Table bordered dataSource={list} className={style.table}  >
                 <Column title="Tên sản phẩm " dataIndex="name" key="name" />
                 <Column title="Giá bán " dataIndex="price" key="price" />
                 <Column title="Giá bán khuyến mại" dataIndex="salePrice" key="salePrice" />
@@ -240,18 +249,18 @@ const Product = () => {
 
                 }} />
                 <Column
-                    title="Action"
+                    title="Thao tác"
                     key="action"
                     render={(text, record: any) => (
 
                         <Space size="middle">
-                            <DeleteOutlined onClick={() => handleDelete(record.id)}>Xóa</DeleteOutlined>
+                            <DeleteOutlined onClick={() => showConfirmDelete(record.id)}>Xóa</DeleteOutlined>
                             <EditOutlined onClick={() => { onedit(record); }}>Sửa </EditOutlined>
                         </Space>
                     )}
                 />
 
-            </Table>
+            </Table>}
             <Modal
                 style={
                     {

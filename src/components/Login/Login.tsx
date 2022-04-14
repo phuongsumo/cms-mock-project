@@ -2,7 +2,7 @@ import React from 'react';
 import { useRecoilState } from 'recoil';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Form, Input, Button, Checkbox, message } from 'antd';
 import styles from './Login.module.css';
 import { accountState } from '../RecoilProvider/RecoilProvider';
 
@@ -25,11 +25,12 @@ const Login: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
                 setAcount(data);
                 setLogin(true);
                 navigate('/')
+                message.success('Đăng nhập thành công')
             } else {
-                alert('Tài khoản hoặc mật khẩu không đúng')
+                message.error('Tài khoản hoặc mật khẩu không đúng')
             }
         } catch (error) {
-            alert('Đã xảy ra lỗi, vui lòng tải lại trang');
+            message.error('Đã xảy ra lỗi, vui lòng tải lại trang');
         }
 
     }

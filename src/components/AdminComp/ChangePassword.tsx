@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { accountState } from '../RecoilProvider/RecoilProvider';
-import { Button, Modal, Form, Input } from 'antd';
+import { Button, Modal, Form, Input, message } from 'antd';
 
 const api = 'https://6227fddb9fd6174ca81830f6.mockapi.io/tea-shop/users/1';
 
@@ -22,16 +22,16 @@ const ChangePassword: React.FC<{ isModalVisible: boolean, setIsModalVisible: Fun
                 localStorage.setItem('account', JSON.stringify(res.data));
                 form.resetFields();
                 setIsModalVisible(false);
-                alert('Đổi mật khẩu thành công');
+                message.success('Đổi mật khẩu thành công');
             })
             .catch((err) => {
                 console.log(err);
-                alert('Có lỗi xảy ra, vui lòng thử lại sau');
+                message.error('Có lỗi xảy ra, vui lòng thử lại sau');
             })
     };
 
     const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
+        message.error('Failed:', errorInfo);
     };
 
     var pwdRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
