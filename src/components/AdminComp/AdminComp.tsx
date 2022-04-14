@@ -33,7 +33,7 @@ const Admin: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
   };
 
   return (
-    <>
+    <div style={{ minHeight: '100vh' }}>
       <h1 className={styles.title}>Admin</h1>
       <Button className={styles.button} type="primary" shape="round" size={'large'} onClick={() => showModal()}>
         Đổi mật khẩu
@@ -42,7 +42,7 @@ const Admin: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
       <Button className={styles.button} type="primary" shape="round" size={'large'} onClick={() => showLogout(setLogin)}>
         <LogoutOutlined />Đăng xuất
       </Button>
-    </>
+    </div>
   )
 }
 

@@ -23,22 +23,22 @@ interface ProductObject {
     key: string;
 }
 
-const formItemLayout = {
-    labelCol: { span: 4 },
+const layout = {
+    labelCol: { span: 8 },
     wrapperCol: { span: 8 },
 };
 const formTailLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 8, offset: 4 },
+    labelCol: { span: 8 },
+    wrapperCol: { span: 5 },
 };
-
 
 const AddProducts = () => {
     const [form] = Form.useForm();
     const Option = Select.Option;
     const [image, setImage] = useState<any>();
     const [imageSelected, setImageSelected] = useState<any>();
-    const [fileList, setFileList] = useState<any>([]);
+    const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
+
     let navigate = useNavigate();
     function handleChange(value: any) {
         console.log(`selected ${value}`);
@@ -62,7 +62,7 @@ const AddProducts = () => {
     }, [image])
 
     const onFinish = (values: any) => {
-
+        setConfirmLoading(true)
         const formData = new FormData();
         formData.append("file", imageSelected);
         formData.append("upload_preset", "tocoproduct");
@@ -90,7 +90,10 @@ const AddProducts = () => {
 
                 // Post data to Api
                 axios.post(api, values)
-                    .then(() => { message.success("Thêm sản phẩm thành công ") })
+                    .then(() => {
+                        message.success("Thêm sản phẩm thành công ")
+                        setConfirmLoading(false)
+                    })
                     .then(() => { navigate("/products", { replace: true }) })
                     .catch(err => message.error('Có lỗi xảy ra'))
             })
@@ -109,13 +112,17 @@ const AddProducts = () => {
     }
 
     return (
-        <>
+        <div style={{ minHeight: '100vh' }}>
             <>
                 <h2> Thêm sản phẩm </h2>
             </>
             <>
 
-                <Form form={form} name="register" initialValues={{ remember: true }} onFinish={onFinish}
+                <Form
+                    {...layout}
+                    form={form} name="register"
+                    initialValues={{ remember: true }}
+                    onFinish={onFinish}
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 10 }}
                 >
@@ -126,7 +133,7 @@ const AddProducts = () => {
                                 message: 'Vui lòng nhập tên sản phẩm',
                             },
                             { whitespace: true },
-                            { min: 6 }
+                            { min: 6, message: 'Vui lòng nhập tối thiểu 6 ký tự' }
                         ]}
                         hasFeedback>
                         <Input name="name" className={`${Error.name ? 'is-invalid' : ''}`} placeholder="Tên sản phẩm" />
@@ -135,8 +142,7 @@ const AddProducts = () => {
                         required: true,
                         message: 'Vui lòng nhập giá bán',
                     },
-                    { whitespace: true },
-                    { min: 1 }
+                    { whitespace: true }
                     ]}
                         hasFeedback>
                         <Input name="price" min={1} style={{ width: '100%' }} placeholder="Nhập giá bán" />
@@ -144,8 +150,7 @@ const AddProducts = () => {
                     <Form.Item name="salePrice" label="Nhập giá bán khuyến mãi" rules={[{
                         required: false
                     },
-                    { whitespace: true },
-                    { min: 1 }
+                    { whitespace: true }
                     ]}
                         hasFeedback>
                         <Input name="salePrice" min={1} style={{ width: '100%' }} placeholder="Giá khuyến mại" defaultValue='' />
@@ -184,11 +189,16 @@ const AddProducts = () => {
                         </label>
 
                     </Form.Item>
-                    <Form.Item name="size" label="Chọn các kích thước sản phẩm" rules={[{
-                        required: true,
-                        message: 'Vui lòng chọn kích thước sản phẩm',
-                    },]}
-                        hasFeedback>
+                    <Form.Item
+                        {...formTailLayout}
+                        name="size"
+                        label="Kích thước sản phẩm"
+                        rules={[{
+                            required: true,
+                            message: 'Vui lòng chọn kích thước sản phẩm',
+                        },]}
+                        hasFeedback
+                    >
                         <Checkbox.Group>
                             <Row>
                                 <Col>
@@ -205,6 +215,7 @@ const AddProducts = () => {
                         </Checkbox.Group>
                     </Form.Item>
                     <Form.Item
+                        {...formTailLayout}
                         name="hot"
                         label="Sản phẩm nổi bật"
                     >
@@ -214,11 +225,19 @@ const AddProducts = () => {
                         </Radio.Group>
 
                     </Form.Item>
-                    <Button style={{ width: '200px' }} type="primary" htmlType="submit"> Thêm </Button>
+                    <Button
+                        style={{ width: '200px', marginTop: '16px' }}
+                        type="primary"
+                        htmlType="submit"
+                        disabled={confirmLoading}
+                    >
+                        Thêm
+                    </Button>
 
                 </Form>
 
-            </></>
+            </>
+        </div>
 
     )
 }

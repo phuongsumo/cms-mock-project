@@ -162,7 +162,7 @@ const Orders = () => {
     };
 
     return (
-        <>
+        <div style={{ minHeight: '100vh' }}>
             <Details details={details} setDetails={setDetails} record={record} />
             <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
                 <Form.Item name="fullName" label="Người đặt">
@@ -261,7 +261,7 @@ const Orders = () => {
                         />
                     </ColumnGroup>
                 </Table>}
-        </>
+        </div>
     )
 }
 
