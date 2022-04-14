@@ -189,6 +189,7 @@ const Orders = () => {
                     bordered
                     dataSource={data}
                     scroll={{ x: 250 }}
+                    pagination={{ position: ['topLeft', 'bottomRight'] }}
                 >
                     <ColumnGroup title="Thông tin đơn hàng">
                         <Column title="Người đặt" dataIndex="fullName" key="fullName" />

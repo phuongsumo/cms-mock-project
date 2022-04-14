@@ -87,6 +87,7 @@ const Users = () => {
                     bordered
                     dataSource={list}
                     scroll={{ x: 300 }}
+                    pagination={{ position: ['topLeft', 'bottomRight'] }}
                 >
                     <Column title="Tên đăng nhập" dataIndex="username" key="username" />
                     <Column title="Mật khẩu" dataIndex="password" key="password" />

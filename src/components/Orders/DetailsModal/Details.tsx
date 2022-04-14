@@ -17,8 +17,8 @@ const Details: React.FC<{ details: boolean, setDetails: Function, record: any }>
                 title={`Đơn hàng (${record.time})`}
                 visible={details}
                 centered
-                onOk={() => setDetails(false)}
                 onCancel={() => setDetails(false)}
+                okButtonProps={{ hidden: true }}
                 width={1500}
                 style={{ top: 10 }}
             >
@@ -28,7 +28,7 @@ const Details: React.FC<{ details: boolean, setDetails: Function, record: any }>
                     scroll={{ y: 300 }}
                     footer={(record: any) => {
                         let totalPrice: number = record.reduce((a: any, b: any) => a + Number(b.total), 0);
-                        return `Tổng thanh toán: ${totalPrice.toLocaleString('vi', { style: 'currency', currency: 'VND' })}`
+                        return `Tổng thanh toán: ${totalPrice.toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}`
                     }}
                 >
                     <Column width={150} title="Tên" dataIndex="name" key="name" />
@@ -77,8 +77,20 @@ const Details: React.FC<{ details: boolean, setDetails: Function, record: any }>
                             </Space>
                         )}
                     />
-                    <Column width={120} title="Đơn giá" dataIndex="price" key="price" />
-                    <Column width={120} title="Thành tiền" dataIndex="total" key="total" />
+                    <Column width={120} title="Đơn giá" key="price"
+                        render={(text, record: any) => (
+                            <Space size="middle">
+                                <span>{Number(record.price).toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}</span>
+                            </Space>
+                        )}
+                    />
+                    <Column width={120} title="Thành tiền" key="total"
+                        render={(text, record: any) => (
+                            <Space size="middle">
+                                <span>{Number(record.total).toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}</span>
+                            </Space>
+                        )}
+                    />
                 </Table>
             </Modal>
         </>

@@ -157,10 +157,28 @@ const Product = () => {
             </Link>
 
             {spin ? <Spin></Spin> :
-                <Table bordered dataSource={list} className={style.table} scroll={{ x: 300 }} >
+                <Table
+                    bordered
+                    dataSource={list}
+                    className={style.table}
+                    scroll={{ x: 300 }}
+                    pagination={{ position: ['topLeft', 'bottomRight'] }}
+                >
                     <Column title="Tên sản phẩm " dataIndex="name" key="name" />
-                    <Column title="Giá bán " dataIndex="price" key="price" />
-                    <Column title="Giá bán khuyến mại" dataIndex="salePrice" key="salePrice" />
+                    <Column title="Giá bán " key="price"
+                        render={(text, record: any) => (
+                            <Space size="middle">
+                                <span>{Number(record.price).toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}</span>
+                            </Space>
+                        )}
+                    />
+                    <Column title="Giá khuyến mại" key="salePrice"
+                        render={(text, record: any) => (
+                            <Space size="middle">
+                                {record.salePrice && <span>{Number(record.salePrice).toLocaleString('it-IT', { style: 'currency', currency: 'VND' })}</span>}
+                            </Space>
+                        )}
+                    />
                     <Column title="Ảnh minh họa" key="image" render={(text, record: any) => (
                         <Space size="middle">
                             <img style={{ width: 100, height: 100, objectFit: 'cover' }}
@@ -283,21 +301,18 @@ const Product = () => {
                         ]}
                         hasFeedback>
                         <Input value={editProduct.name} onChange={(e) => {
-                            if (e.target.value === '') {
-                                message.error('Không được để trông tên sản phẩm')
+                            if (e.target.value.length < 3) {
+                                message.error('Tên sản phẩm phải trên 5 ký tự')
                             }
                             else {
                                 setEditProduct((pre: any) => {
                                     return { ...pre, name: e.target.value }
                                 })
                             }
-
-
                         }} />
                     </Form.Item>
                     <Form.Item label="Giá bán" rules={[{
                         required: true,
-
                     },
                     { whitespace: true },
                     { min: 1 }
@@ -305,7 +320,9 @@ const Product = () => {
                         hasFeedback>
                         <Input value={editProduct.price} onChange={(e) => {
                             if (e.target.value === '') {
-                                message.error('Không được để trông giá sản phẩm')
+                                message.error('Không được để trống giá sản phẩm')
+                            } else if (parseInt(e.target.value) < 0) {
+                                message.error('Giá sản phẩm âm')
                             }
                             else {
                                 setEditProduct((pre: any) => {

@@ -1,15 +1,19 @@
 .btn {
     margin: 16px 0;
     display: block;
-    background-color: rgb(70, 126, 209);
-    width: 100px;
-    height: 40px;
-    line-height: 40px;
+    background-color: #d3b673;
+    width: 150px;
+    height: 50px;
+    line-height: 35px;
+    padding: 6.5px 11px;
+    font-size: 18px;
     color: white;
+    /* float: right; */
 }
 
 .btn:hover {
-    background-color: rgb(199, 139, 139);
+    background-color: #cebc94;
+    color: #000;
 }
 
 .btn_submit {

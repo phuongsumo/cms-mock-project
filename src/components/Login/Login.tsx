@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,8 @@ import styles from './Login.module.css';
 import { accountState } from '../RecoilProvider/RecoilProvider';
 
 const Login: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
-    const [account, setAcount] = useRecoilState(accountState)
+    const [account, setAcount] = useRecoilState(accountState);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ const Login: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
 
     const onFinish = async (values: any) => {
         try {
+            setLoading(true)
             const data = await fetchData('https://6227fddb9fd6174ca81830f6.mockapi.io/tea-shop/users/1');
             if (values.username === data.username && values.password === data.password) {
                 localStorage.setItem('account', JSON.stringify(data))
@@ -26,8 +28,10 @@ const Login: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
                 setLogin(true);
                 navigate('/')
                 message.success('Đăng nhập thành công')
+                setLoading(false)
             } else {
                 message.error('Tài khoản hoặc mật khẩu không đúng')
+                setLoading(false)
             }
         } catch (error) {
             message.error('Đã xảy ra lỗi, vui lòng tải lại trang');
@@ -70,12 +74,10 @@ const Login: React.FC<{ setLogin: Function }> = ({ setLogin }) => {
                     <Input.Password />
                 </Form.Item>
 
-                <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 0, span: 12 }} className={styles.form_item}>
-                    <Checkbox>Remember me</Checkbox>
-                </Form.Item>
-
-                <Form.Item wrapperCol={{ offset: 6, span: 12 }} className={styles.form_item}>
-                    <Button type="primary" htmlType="submit">
+                <Form.Item
+                    wrapperCol={{ offset: 0, span: 16 }}
+                    className={styles.form_item}>
+                    <Button className={styles.login_btn} disabled={loading} type="primary" htmlType="submit">
                         Đăng nhập
                     </Button>
                 </Form.Item>

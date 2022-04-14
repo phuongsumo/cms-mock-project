@@ -2,6 +2,7 @@
     width: 100%;
     height: 60px;
 }
+
 .logo_img {
     width: 100%;
     height: 100%;
@@ -28,7 +29,7 @@
 }
 
 @media (max-width: 992px) {
-    
+
     .menu {
         display: none;
     }
