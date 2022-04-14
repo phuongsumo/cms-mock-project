@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
-import { Table, Space, Input, Checkbox, Modal, Form, Select, Radio, message, Spin, Button } from 'antd';
+import { Table, Space, Input, Checkbox, Modal, Form, Select, Radio, message, Spin } from 'antd';
 import styles from '../Products/Product.module.css'
 import { AudioOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import style from './Product.module.css'
@@ -12,45 +12,30 @@ const api = 'https://6227fddb9fd6174ca81830f6.mockapi.io/tea-shop/product';
 const apiImage = 'https://api.cloudinary.com/v1_1/tocotoco/image/upload';
 
 interface ProductObject {
+    lenght: any;
     name: string;
     price: string;
     salePrice: string;
     image: string;
     category: string;
-    sizeM: boolean;
-    sizeL: boolean;
-    hot: boolean;
+    sizeM: string;
+    sizeL: string;
     id: string;
     key: string;
     created_at: string;
-}
-
-const INIT_PRODUCT = {
-    name: '',
-    price: '',
-    salePrice: '',
-    image: '',
-    category: '',
-    sizeM: false,
-    sizeL: false,
-    hot: false,
-    id: '',
-    key: '',
-    created_at: '',
 }
 
 const Product = () => {
     const [data, setData] = useState<ProductObject[]>([]);
     const [list, setList] = useState<ProductObject[]>([]);
     const [spin, setSpin] = useState<boolean>(true);
-    const [reRender, setReRender] = useState<any>('');
+    const [reRender, setReRender] = useState<string>('');
     const [isEditing, setEditing] = useState(false);
-    const [editProduct, setEditProduct] = useState<ProductObject>(INIT_PRODUCT)
+    const [editProduct, setEditProduct] = useState<any>('')
     const Option = Select.Option;
     const [form] = Form.useForm();
     const [image, setImage] = useState<any>();
     const [imageSelected, setImageSelected] = useState<any>();
-    const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
 
     const { Column } = Table;
     const { confirm } = Modal;
@@ -99,6 +84,14 @@ const Product = () => {
 
     const { Search } = Input;
 
+    const suffix = (
+        <AudioOutlined
+            style={{
+                fontSize: 16,
+                color: '#1890ff',
+            }}
+        />
+    );
     const onSearch = (value: any) => {
         let users = data.filter(user => {
             return user.name.toLowerCase().includes(value.toLowerCase());
@@ -131,7 +124,8 @@ const Product = () => {
             const formData = new FormData();
             formData.append("file", imageSelected);
             formData.append("upload_preset", "tocoproduct");
-            setConfirmLoading(true)
+
+
             axios.post(apiImage, formData)
                 .then(response => {
                     // Assign data to Cloudinary image URL
@@ -141,31 +135,27 @@ const Product = () => {
                         .then((res) => {
                             message.success('Thay đổi thành công')
                             setEditing(false);
-                            setConfirmLoading(false)
-                            setReRender(res)
                         })
                         .catch(err => message.error('Có lỗi xảy ra'))
                 })
                 .catch(err => message.error('Có lỗi xảy ra'))
         } else {
-            setConfirmLoading(true)
             axios.put(`${api}/${values.id}`, values)
                 .then((res) => {
                     message.success('Thay đổi thành công')
-                    setReRender(res);
                     setEditing(false);
-                    setConfirmLoading(false);
                 })
                 .catch(err => message.error('Có lỗi xảy ra'))
         }
     }
 
     return (
-        <div style={{ minHeight: '100vh' }}>
+        <>
             <Search
                 placeholder="Tìm kiếm tên sản phẩm"
                 enterButton="Tìm kiếm"
                 size="large"
+                suffix={suffix}
                 onSearch={onSearch}
             />
 
@@ -276,22 +266,17 @@ const Product = () => {
                 style={
                     {
                         width: '70%',
-                        top: 10
                     }
                 }
                 title="Sửa sản phẩm"
                 visible={isEditing}
-                confirmLoading={confirmLoading}
                 okText="Save"
-                okButtonProps={{ hidden: true }}
                 onCancel={() => {
                     resetEditing()
                 }}
-            // onOk={() => handleEditSubmit(editProduct)}
+                onOk={() => handleEditSubmit(editProduct)}
             >
-                <Form form={form} name="register"
-                    onFinish={() => handleEditSubmit(editProduct)}
-                    initialValues={{ remember: true }}
+                <Form form={form} name="register" initialValues={{ remember: true }}
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 10 }}
                 >
@@ -299,36 +284,49 @@ const Product = () => {
                         rules={[
                             {
                                 required: true,
-                                message: 'Không được để trống tên sản phẩm',
                             },
                             { whitespace: true },
-                            { min: 6, message: 'Vui lòng nhập tối thiểu 6 ký tự' }
+                            { min: 6 }
                         ]}
-                        hasFeedback
-                    >
+                        hasFeedback>
                         <Input value={editProduct.name} onChange={(e) => {
-                            setEditProduct((pre: any) => {
-                                return { ...pre, name: e.target.value }
-                            })
+                            if (e.target.value === '') {
+                                message.error('Không được để trông tên sản phẩm')
+                            }
+                            else {
+                                setEditProduct((pre: any) => {
+                                    return { ...pre, name: e.target.value }
+                                })
+                            }
+
+
                         }} />
                     </Form.Item>
                     <Form.Item label="Giá bán" rules={[{
                         required: true,
-                        message: 'Không được để trống giá bán',
+
                     },
                     { whitespace: true },
+                    { min: 1 }
                     ]}
                         hasFeedback>
                         <Input value={editProduct.price} onChange={(e) => {
-                            setEditProduct((pre: any) => {
-                                return { ...pre, price: e.target.value }
-                            })
+                            if (e.target.value === '') {
+                                message.error('Không được để trông giá sản phẩm')
+                            }
+                            else {
+                                setEditProduct((pre: any) => {
+                                    return { ...pre, price: e.target.value }
+                                })
+                            }
+
                         }} />
                     </Form.Item>
                     <Form.Item label="Giá bán khuyến mãi" rules={[{
                         required: false
                     },
                     { whitespace: true },
+                    { min: 1 }
                     ]}
                         hasFeedback>
                         <Input value={editProduct.salePrice} onChange={(e) => {
@@ -341,7 +339,6 @@ const Product = () => {
                         <Select placeholder="Loại sản phẩm"
                             style={{ width: '100%' }}
                             onChange={(e) => {
-                                console.log(e);
 
                                 setEditProduct((pre: any) => {
                                     return { ...pre, category: e }
@@ -382,13 +379,7 @@ const Product = () => {
                         </label>
 
                     </Form.Item>
-                    <Form.Item
-                        label="Kích thước sản phẩm"
-                        rules={[{
-                            required: true,
-                            message: 'Không được để trống size sản phẩm',
-                        }]}
-                    >
+                    <Form.Item name='size' label="Kích thước sản phẩm">
                         <Checkbox
                             value="1"
                             style={{ lineHeight: '32px' }}
@@ -413,6 +404,7 @@ const Product = () => {
                         >
                             Size L
                         </Checkbox>
+
                     </Form.Item>
                     <Form.Item
                         label="Sản phẩm nổi bật"
@@ -425,15 +417,14 @@ const Product = () => {
                             <Radio value={true}>Có</Radio>
                             <Radio value={false}>Không</Radio>
                         </Radio.Group>
-                    </Form.Item>
-                    <Form.Item wrapperCol={{ offset: 10, span: 12 }}>
-                        <Button disabled={confirmLoading} type="primary" htmlType="submit">
-                            Xác nhận
-                        </Button>
+
                     </Form.Item>
                 </Form>
+
+
+
             </Modal>
-        </div>
+        </>
     )
 }
 
