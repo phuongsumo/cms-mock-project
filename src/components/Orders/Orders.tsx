@@ -32,7 +32,7 @@ const initialValues = {
 }
 
 const api = 'https://6243085ab6734894c15a1d8e.mockapi.io/tea-shop/orders';
-
+const apiUser = 'https://6227fddb9fd6174ca81830f6.mockapi.io/tea-shop/users';
 const Orders = () => {
     const [data, setData] = useState<RootObject[]>([]);
     const [details, setDetails] = useState<boolean>(false);
@@ -74,30 +74,67 @@ const Orders = () => {
     const handleChangePaid = (value: any) => {
         setDisabledCheckBox(true)
         const paidStatus = value.paid
+
+        // Up date paid status on Orders API
         axios.put(`${api}/${value.id}`, { ...value, paid: !paidStatus })
             .then(response => {
                 setReRender(response.data)
                 setDisabledCheckBox(false)
             })
             .catch(error => console.log(error))
+
+        // Up date paid status on Users API
+        axios.get(apiUser)
+            .then(response => {
+                const data = response.data;
+                // Search user 
+                const user = data.find((user: any) => user.username === value.username);
+                if (user) {
+                    // Search this order of user
+                    const order = user.orders.find((order: any) => order.time === value.time);
+                    let indexOrder = user.orders.indexOf(order);
+                    // Update paid status
+                    user.orders[indexOrder] = { ...value, paid: !paidStatus }
+                    // Put to api
+                    axios.put(`${apiUser}/${user.id}`, user)
+                }
+            })
     }
 
     const handleChangeStatus = (value: string, record: any) => {
         setDisabledSelect(true)
+        // Up date status on Orders API
         axios.put(`${api}/${record.id}`, { ...record, status: value })
             .then(response => {
                 setReRender(response.data)
                 setDisabledSelect(false)
             })
             .catch(error => console.log(error))
+
+        // Up date status on Users API
+        axios.get(apiUser)
+            .then(response => {
+                const data = response.data;
+                // Search user 
+                const user = data.find((user: any) => user.username === record.username);
+                if (user) {
+                    // Search this order of user
+                    const order = user.orders.find((order: any) => order.time === record.time);
+                    let indexOrder = user.orders.indexOf(order);
+                    // Update paid status
+                    user.orders[indexOrder] = { ...record, status: value }
+                    // Put to api
+                    axios.put(`${apiUser}/${user.id}`, user)
+                }
+            })
     }
 
     const layout = {
-        labelCol: { span: 2 },
+        labelCol: { span: 3 },
         wrapperCol: { span: 16 },
     };
     const tailLayout = {
-        wrapperCol: { offset: 2, span: 16 },
+        wrapperCol: { offset: 3, span: 16 },
     };
 
     const onFinish = async (values: any) => {
@@ -162,7 +199,7 @@ const Orders = () => {
                             key="orders"
                             render={(text, record: any) => (
                                 <Space size="middle">
-                                    <a onClick={() => handleDetails(record)}>Chi tiết</a>
+                                    <Button type="primary" onClick={() => handleDetails(record)}>Chi tiết</Button>
                                 </Space>
                             )}
                         />

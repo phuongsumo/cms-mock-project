@@ -1,4 +1,4 @@
-import { Button, Checkbox, Col, Form, Input, Radio, Row, Select } from "antd"
+import { Button, Checkbox, Col, Form, Input, message, Radio, Row, Select } from "antd"
 import React, { useEffect, useState } from "react"
 import styles from '../Product.module.css'
 import axios from "axios"
@@ -55,6 +55,12 @@ const AddProducts = () => {
         fetchData();
     }, [])
 
+    useEffect(() => {
+        return () => {
+            image && URL.revokeObjectURL(image.preview)
+        }
+    }, [image])
+
     const onFinish = (values: any) => {
 
         const formData = new FormData();
@@ -87,8 +93,11 @@ const AddProducts = () => {
                     .then(() => { alert("Thêm sản phẩm thành công ") })
                     .then(() => { navigate("/products", { replace: true }) })
                     .catch(err => alert('Có lỗi xảy ra'))
+                    .then(() => { message.success("Thêm sản phẩm thành công ") })
+                    .then(() => { navigate("/products", { replace: true }) })
+                    .catch(err => message.error('Có lỗi xảy ra'))
             })
-            .catch(err => alert('Có lỗi xảy ra'))
+            .catch(err => message.error('Có lỗi xảy ra'))
     };
 
     const handleImageChange = (data: any) => {
@@ -167,7 +176,7 @@ const AddProducts = () => {
                             message: 'Vui lòng chọn ảnh mô tả',
                         },]}
                     >
-                        <label htmlFor="add_img" style={{ width: 100, height: 100, border: '1px solid #807a79', display: 'block' }}>
+                        <label htmlFor="add_img" style={{ width: 100, height: 100, border: '1px solid #807a79', display: 'block', cursor: 'pointer' }}>
                             <input id='add_img' style={{ display: 'none' }} type="file" onChange={(e: any) => handleImageChange(e.target.files[0])} />
                             {image && <img
 
@@ -208,7 +217,7 @@ const AddProducts = () => {
                         </Radio.Group>
 
                     </Form.Item>
-                    <Button style={{ width: '200px' }} type="primary" htmlType="submit"> Submit </Button>
+                    <Button style={{ width: '200px' }} type="primary" htmlType="submit"> Thêm </Button>
 
                 </Form>
 

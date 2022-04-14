@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
-import { Table, Space, Input, Checkbox, Modal, Form, Select, Radio, } from 'antd';
+import { Table, Space, Input, Checkbox, Modal, Form, Select, Radio, message, Spin } from 'antd';
 import styles from '../Products/Product.module.css'
-import { AudioOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { AudioOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import style from './Product.module.css'
 import { Link } from 'react-router-dom';
 
@@ -28,6 +28,7 @@ interface ProductObject {
 const Product = () => {
     const [data, setData] = useState<ProductObject[]>([]);
     const [list, setList] = useState<ProductObject[]>([]);
+    const [spin, setSpin] = useState<boolean>(true);
     const [reRender, setReRender] = useState<string>('');
     const [isEditing, setEditing] = useState(false);
     const [editProduct, setEditProduct] = useState<any>('')
@@ -35,37 +36,50 @@ const Product = () => {
     const [form] = Form.useForm();
     const [image, setImage] = useState<any>();
     const [imageSelected, setImageSelected] = useState<any>();
-    function handleChange(value: any) {
-        console.log(`selected ${value}`);
-
-    }
 
     const { Column } = Table;
+    const { confirm } = Modal;
 
     useEffect(() => {
         axios.get(api)
             .then((response) => {
                 setData(response.data)
                 setList(response.data)
+                setSpin(false)
             })
     }, [reRender])
+
+    useEffect(() => {
+        return () => {
+            image && URL.revokeObjectURL(image.preview)
+        }
+    }, [image])
 
     data.map((product, i) => {
         product.key = product.id
         data[i] = product;
     })
 
-
-    const handleDelete = (id: string) => {
-        if (data.length < 1) {
-            alert('Không thể xóa hết tất cả các sản phẩm!')
-        } else {
-            let result = window.confirm('Bạn chắc chắn muốn xóa sản phẩm này?')
-            if (result) {
-                axios.delete(`${api}/${id}`)
-                    .then(response => setReRender(id))
-            }
-        }
+    function showConfirmDelete(id: string) {
+        confirm({
+            title: 'Bạn chắc chắn muốn xóa sản phẩm này?',
+            icon: <ExclamationCircleOutlined />,
+            content: 'Sản phẩm sẽ bị xóa vĩnh viễn',
+            onOk() {
+                if (data.length < 1) {
+                    message.error('Không thể xóa hết tất cả các sản phẩm!')
+                } else {
+                    axios.delete(`${api}/${id}`)
+                        .then(response => {
+                            setReRender(id)
+                            message.success('Xóa sản phẩm thành công')
+                        })
+                }
+            },
+            onCancel() {
+                console.log('Cancel');
+            },
+        });
     }
 
     const { Search } = Input;
@@ -80,7 +94,7 @@ const Product = () => {
     );
     const onSearch = (value: any) => {
         let users = data.filter(user => {
-            return user.name.includes(value)
+            return user.name.toLowerCase().includes(value.toLowerCase());
         })
         setList(users);
     };
@@ -101,17 +115,16 @@ const Product = () => {
         }
     }
 
-
     const resetEditing = () => {
         setEditing(false);
     }
 
     const handleEditSubmit = (values: any) => {
-
         if (imageSelected) {
             const formData = new FormData();
             formData.append("file", imageSelected);
             formData.append("upload_preset", "tocoproduct");
+
 
             axios.post(apiImage, formData)
                 .then(response => {
@@ -120,104 +133,77 @@ const Product = () => {
                     // Put data to Api
                     axios.put(`${api}/${values.id}`, values)
                         .then((res) => {
-                            alert('Thay đổi thành công')
+                            message.success('Thay đổi thành công')
                             setEditing(false);
                         })
-                        .catch(err => alert('Có lỗi xảy ra'))
+                        .catch(err => message.error('Có lỗi xảy ra'))
                 })
-                .catch(err => alert('Có lỗi xảy ra'))
+                .catch(err => message.error('Có lỗi xảy ra'))
         } else {
             axios.put(`${api}/${values.id}`, values)
                 .then((res) => {
-                    alert('Thay đổi thành công')
+                    message.success('Thay đổi thành công')
                     setEditing(false);
                 })
-                .catch(err => alert('Có lỗi xảy ra'))
+                .catch(err => message.error('Có lỗi xảy ra'))
         }
     }
-
 
     return (
         <>
             <Search
                 placeholder="Tìm kiếm tên sản phẩm"
-                enterButton="Search"
+                enterButton="Tìm kiếm"
                 size="large"
                 suffix={suffix}
                 onSearch={onSearch}
             />
 
-            <>
-                <Link to="/AddProducts" className={style.btn} >
-                    Add product
-                </Link>
+            <Link to="/AddProducts" className={style.btn} >
+                Thêm sản phẩm
+            </Link>
 
-            </>
-
-            <Table bordered dataSource={list} className={style.table}  >
-                <Column title="Tên sản phẩm " dataIndex="name" key="name" />
-                <Column title="Giá bán " dataIndex="price" key="price" />
-                <Column title="Giá bán khuyến mại" dataIndex="salePrice" key="salePrice" />
-                <Column title="Ảnh minh họa" key="image" render={(text, record: any) => (
-                    <Space size="middle">
-                        <img style={{ width: 100, height: 100, objectFit: 'cover' }}
-                            src={record.image}
-                        />
-                    </Space>
-                )} />
-
-
-
-                <Column title="Loại sản phẩm" dataIndex="category" key="category" render={(text, record: any) => {
-                    const a = record.category;
-                    function SwitchCase(props: any): any {
-
-                        switch (a) {
-
-                            case '1':
-
-                                return 'Trà sữa';
-
-                            case '2':
-
-                                return 'Fresh Fruit Tea';
-                            case '3':
-
-                                return 'Machiato Cream Cheese';
-                            case '4':
-
-                                return 'Sữa chua dẻo';
-                            default:
-
-                                return 'Lỗi dữ liệu'
-
-
-                        }
-
-                    }
-                    return (
+            {spin ? <Spin></Spin> :
+                <Table bordered dataSource={list} className={style.table} scroll={{ x: 300 }} >
+                    <Column title="Tên sản phẩm " dataIndex="name" key="name" />
+                    <Column title="Giá bán " dataIndex="price" key="price" />
+                    <Column title="Giá bán khuyến mại" dataIndex="salePrice" key="salePrice" />
+                    <Column title="Ảnh minh họa" key="image" render={(text, record: any) => (
                         <Space size="middle">
-                            <SwitchCase />
+                            <img style={{ width: 100, height: 100, objectFit: 'cover' }}
+                                src={record.image}
+                            />
                         </Space>
-                    )
+                    )} />
 
-                }
 
-                } />
-                <Column title="Kích thức sản phẩm" dataIndex="sizeM"
-                    render={(text, record: any) => {
-                        const a = record.sizeM;
-                        const b = record.sizeL;
+
+                    <Column title="Loại sản phẩm" dataIndex="category" key="category" render={(text, record: any) => {
+                        const a = record.category;
                         function SwitchCase(props: any): any {
 
-                            if (!a) {
-                                return (<b style={{ color: '#9FC088' }}> Size L </b>)
-                            } else if (!b) {
-                                return (<b style={{ color: '#E8C07D' }}> Size M </b>)
+                            switch (a) {
+
+                                case '1':
+
+                                    return 'Trà sữa';
+
+                                case '2':
+
+                                    return 'Fresh Fruit Tea';
+                                case '3':
+
+                                    return 'Machiato Cream Cheese';
+                                case '4':
+
+                                    return 'Sữa chua dẻo';
+                                default:
+
+                                    return 'Lỗi dữ liệu'
+
+
                             }
-                            else {
-                                return (<b style={{ color: '#CC704B' }}> Size M và Size L </b>)
-                            }
+
                         }
                         return (
                             <Space size="middle">
@@ -225,33 +211,57 @@ const Product = () => {
                             </Space>
                         )
 
-                    }} />
-                <Column title="Sản phẩm hot" dataIndex="hot" render={(text, record: any) => {
-                    return (
-                        <Space size="middle">
-                            {record.hot
-                                ?
-                                <p style={{ color: 'red' }}> Hot </p>
-                                :
-                                <p style={{ color: 'green' }}> Không hot </p>
+                    }
+
+                    } />
+                    <Column title="Kích thức sản phẩm" dataIndex="sizeM"
+                        render={(text, record: any) => {
+                            const a = record.sizeM;
+                            const b = record.sizeL;
+                            function SwitchCase(props: any): any {
+
+                                if (!a) {
+                                    return (<b style={{ color: '#9FC088' }}> Size L </b>)
+                                } else if (!b) {
+                                    return (<b style={{ color: '#E8C07D' }}> Size M </b>)
+                                }
+                                else {
+                                    return (<b style={{ color: '#CC704B' }}> Size M và Size L </b>)
+                                }
                             }
-                        </Space>
-                    )
+                            return (
+                                <Space size="middle">
+                                    <SwitchCase />
+                                </Space>
+                            )
 
-                }} />
-                <Column
-                    title="Action"
-                    key="action"
-                    render={(text, record: any) => (
+                        }} />
+                    <Column title="Sản phẩm hot" dataIndex="hot" render={(text, record: any) => {
+                        return (
+                            <Space size="middle">
+                                {record.hot
+                                    ?
+                                    <p style={{ color: 'red' }}> Hot </p>
+                                    :
+                                    <p style={{ color: 'green' }}> Không hot </p>
+                                }
+                            </Space>
+                        )
 
-                        <Space size="middle">
-                            <DeleteOutlined onClick={() => handleDelete(record.id)}>Xóa</DeleteOutlined>
-                            <EditOutlined onClick={() => { onedit(record); }}>Sửa </EditOutlined>
-                        </Space>
-                    )}
-                />
+                    }} />
+                    <Column
+                        title="Thao tác"
+                        key="action"
+                        render={(text, record: any) => (
 
-            </Table>
+                            <Space size="middle">
+                                <DeleteOutlined onClick={() => showConfirmDelete(record.id)}>Xóa</DeleteOutlined>
+                                <EditOutlined onClick={() => { onedit(record); }}>Sửa </EditOutlined>
+                            </Space>
+                        )}
+                    />
+
+                </Table>}
             <Modal
                 style={
                     {
@@ -274,30 +284,42 @@ const Product = () => {
                         rules={[
                             {
                                 required: true,
-                                message: 'Không được để trông tên sản phẩm',
                             },
                             { whitespace: true },
                             { min: 6 }
                         ]}
                         hasFeedback>
                         <Input value={editProduct.name} onChange={(e) => {
-                            setEditProduct((pre: any) => {
-                                return { ...pre, name: e.target.value }
-                            })
+                            if (e.target.value === '') {
+                                message.error('Không được để trông tên sản phẩm')
+                            }
+                            else {
+                                setEditProduct((pre: any) => {
+                                    return { ...pre, name: e.target.value }
+                                })
+                            }
+
+
                         }} />
                     </Form.Item>
                     <Form.Item label="Giá bán" rules={[{
                         required: true,
-                        message: 'Không được để trông  giá bán',
+
                     },
                     { whitespace: true },
                     { min: 1 }
                     ]}
                         hasFeedback>
                         <Input value={editProduct.price} onChange={(e) => {
-                            setEditProduct((pre: any) => {
-                                return { ...pre, price: e.target.value }
-                            })
+                            if (e.target.value === '') {
+                                message.error('Không được để trông giá sản phẩm')
+                            }
+                            else {
+                                setEditProduct((pre: any) => {
+                                    return { ...pre, price: e.target.value }
+                                })
+                            }
+
                         }} />
                     </Form.Item>
                     <Form.Item label="Giá bán khuyến mãi" rules={[{
@@ -317,7 +339,6 @@ const Product = () => {
                         <Select placeholder="Loại sản phẩm"
                             style={{ width: '100%' }}
                             onChange={(e) => {
-                                console.log(e);
 
                                 setEditProduct((pre: any) => {
                                     return { ...pre, category: e }
