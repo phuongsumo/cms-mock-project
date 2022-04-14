@@ -84,14 +84,6 @@ const Product = () => {
 
     const { Search } = Input;
 
-    const suffix = (
-        <AudioOutlined
-            style={{
-                fontSize: 16,
-                color: '#1890ff',
-            }}
-        />
-    );
     const onSearch = (value: any) => {
         let users = data.filter(user => {
             return user.name.toLowerCase().includes(value.toLowerCase());
@@ -157,7 +149,6 @@ const Product = () => {
                 placeholder="Tìm kiếm tên sản phẩm"
                 enterButton="Tìm kiếm"
                 size="large"
-                suffix={suffix}
                 onSearch={onSearch}
             />
 
