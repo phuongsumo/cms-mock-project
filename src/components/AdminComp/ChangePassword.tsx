@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { accountState } from '../RecoilProvider/RecoilProvider';
@@ -8,6 +8,7 @@ const api = 'https://6227fddb9fd6174ca81830f6.mockapi.io/tea-shop/users/1';
 
 const ChangePassword: React.FC<{ isModalVisible: boolean, setIsModalVisible: Function }> = ({ isModalVisible, setIsModalVisible }) => {
     const [account, setAccount] = useRecoilState(accountState);
+    const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [form] = Form.useForm();
 
     const handleCancel = () => {
@@ -16,22 +17,34 @@ const ChangePassword: React.FC<{ isModalVisible: boolean, setIsModalVisible: Fun
     };
 
     const onFinish = (values: any) => {
-        axios.put(api, { ...account, password: values.newPassword })
-            .then((res) => {
-                setAccount(res.data);
-                localStorage.setItem('account', JSON.stringify(res.data));
-                form.resetFields();
-                setIsModalVisible(false);
-                message.success('Đổi mật khẩu thành công');
+        setConfirmLoading(true)
+        axios.get(api)
+            .then((response) => {
+                let user = response.data
+                if (values.oldPassword === user.password) {
+                    axios.put(api, { ...account, password: values.newPassword })
+                        .then((res) => {
+                            setAccount(res.data);
+                            localStorage.setItem('account', JSON.stringify(res.data));
+                            form.resetFields();
+                            setIsModalVisible(false);
+                            message.success('Đổi mật khẩu thành công');
+                            setConfirmLoading(false)
+                        })
+                        .catch((err) => {
+                            message.error('Có lỗi xảy ra, vui lòng thử lại sau');
+                        })
+                } else {
+                    message.error('Mật khẩu cũ không đúng, vui lòng thử lại');
+                    setConfirmLoading(false)
+                }
             })
-            .catch((err) => {
-                console.log(err);
-                message.error('Có lỗi xảy ra, vui lòng thử lại sau');
-            })
+
+
     };
 
     const onFinishFailed = (errorInfo: any) => {
-        message.error('Failed:', errorInfo);
+        message.error('Có lỗi xảy ra');
     };
 
     var pwdRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
@@ -57,17 +70,9 @@ const ChangePassword: React.FC<{ isModalVisible: boolean, setIsModalVisible: Fun
                     hasFeedback
                     rules={[
                         { required: true, message: 'Vui lòng nhập mật khẩu cũ' },
-                        () => ({
-                            validator(_, value) {
-                                if (!value || account.password === value) {
-                                    return Promise.resolve();
-                                }
-                                return Promise.reject(new Error('Mật khẩu xác nhận chưa chính xác'));
-                            },
-                        })
                     ]}
                 >
-                    <Input />
+                    <Input.Password />
                 </Form.Item>
 
                 <Form.Item
@@ -117,7 +122,7 @@ const ChangePassword: React.FC<{ isModalVisible: boolean, setIsModalVisible: Fun
                     <Input.Password />
                 </Form.Item>
                 <Form.Item wrapperCol={{ offset: 10, span: 12 }}>
-                    <Button type="primary" htmlType="submit">
+                    <Button disabled={confirmLoading} type="primary" htmlType="submit">
                         Xác nhận
                     </Button>
                 </Form.Item>

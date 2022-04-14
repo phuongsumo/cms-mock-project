@@ -75,7 +75,7 @@ const Users = () => {
     }
 
     return (
-        <>
+        <div style={{ minHeight: '100vh' }}>
             <Input
                 placeholder="Tìm kiếm tài khoản..."
                 allowClear
@@ -104,7 +104,7 @@ const Users = () => {
                         )}
                     />
                 </Table>}
-        </>
+        </div>
     )
 }
 
